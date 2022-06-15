@@ -7,15 +7,15 @@ from PIL import ImageDraw
 import xmltodict
 import io
 import time
-
+import os
 
 
 class Wolfram(object):
-
-
+    
     def __init__(self,question):
 
-        self.appid="########use your wolfram app id here########"
+        #***********use your wolfram app id here***********#
+        self.appid="demo"#like: self.appid="XXXXXXXXXXXXXXX"
         self.query=question
         self.url=f"http://api.wolframalpha.com/v2/query?appid={self.appid}&input="
         self.image_url_array=[]
@@ -26,9 +26,10 @@ class Wolfram(object):
     def download_image(self,url):
 
         #to download the image from url
-        imag=urlopen(url)
-        raw = io.BytesIO(imag.read())
-        return PIL.Image.open(raw).convert('RGBA')
+        image_link=urlopen(url,timeout=20)
+        raw =io.BytesIO(image_link.read())
+        image =PIL.Image.open(raw).convert('RGBA') 
+        return image
 
 
     def url_encode(self,query):
@@ -48,7 +49,7 @@ class Wolfram(object):
                 encoded_query=encoded_query+"%3D"
             else :
                 encoded_query=encoded_query+word
-        print (encoded_query)
+        #print (encoded_query)
         return encoded_query
 
 
@@ -78,11 +79,8 @@ class Wolfram(object):
             if (int(doc["queryresult"]["pod"][i]["@numsubpods"]) >1):
                 continue
             
-
             self.pod_title.append(doc["queryresult"]["pod"][i]["@title"])
             self.image_url_array.append(doc["queryresult"]["pod"][i]["subpod"]["img"]["@src"])
-              
-        print("feching image_url and title compleate")
         return True
 
 
@@ -102,16 +100,13 @@ class Wolfram(object):
         widths, heights = zip(*(i.size for i in images))
         new_width = max(widths)+50
         new_height = sum(heights)+100
-        new_im = Image.new('RGB', (new_width, new_height), color=(255,255,255))
-
+        new_image = Image.new('RGB', (new_width, new_height), color=(255,255,255))
         offset =20
-        for im in images:
+        for image in images:
             x = 10
-        
-            new_im.paste(im, (x, offset))
-            offset += im.size[1]+10
-        return new_im
-
+            new_image.paste(image, (x, offset))
+            offset += image.size[1]+10
+        return new_image
 
 
     def image_processing(self):
@@ -120,42 +115,46 @@ class Wolfram(object):
         #split image into multiple if too large
         max_height=300
         temp=[]
-        re=[]
+        res=[]
         current_height=0
 
         for i in self.img_array:
             current_height=current_height+i.size[1]
-
             if current_height>=max_height or current_height >280 :
-                re.append(self.merge_image(temp))
+                res.append(self.merge_image(temp))
                 current_height=0
                 temp=[]
             temp.append(i)
         try:
-            re.append(self.merge_image(temp))
+            res.append(self.merge_image(temp))
         except ValueError:
             pass
-        print ("Image processing Successfull")   
-        return re
+        print ("Image processing Successful")   
+        return res
+
 
     def output(self):
 
         #output is in [A,B] where A is true/false depend on 
         #sucess of the query and B is a list which contain 
         #all the image the contains the result
+        print("Input: "+self.query)
         start=time.time()
         query=self.url_encode(self.query)
         xml=urlopen(self.url+query).read()
-        print ("success connecting")
+        print ("Connection Sucessful")
         result_check=self.response_handling(xml)
-        print ("Checking Wolfram response")
+        print ("Checking Wolfram response.....")
+
         if(result_check):
-            a=self.image_array_setup()
+            print("Got result from Wolfram")
+            images_list=self.image_array_setup()
             end=time.time()
-            print(f"Runtime:{end-start}")
-            return (True,a)
+            print(f"Runtime:{round(end-start,2)} s")
+            return (True,images_list)
         else :
-            return(False,"a")
+            print("Did not get result from Wolfram")
+            return(False,"No Result")
             
 
 
@@ -163,9 +162,26 @@ class Wolfram(object):
 
 
 if __name__=="__main__":
-    #test to show the first image of the result
-    a=Wolfram("2+2")
-    a.output()[1][0].show()
-    print("done")
 
+    question = input("\nEnter your Query:") 
+    wolfram=Wolfram(question)
+    Is_succesfull=wolfram.output()
 
+    if(Is_succesfull[0]):
+        result_list=Is_succesfull[1]
+
+        #To show the first image of the result
+        #result_list[0].show()
+
+        #To save all the images of the result in a temp folder src/temp
+        try: 
+            os.mkdir("temp") 
+        except OSError as error: 
+            pass
+        i=0
+        for img in result_list:
+            i+=1
+            img.save(f"temp/result{i}.png")
+        print("Check src/temp folder")      
+    else:
+        pass  
