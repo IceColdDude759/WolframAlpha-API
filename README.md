@@ -17,7 +17,7 @@ build and version of Python for your operating system [here](https://python.org/
 * `xmltodict`
 
 
-You also need to have Wolfram account and have the Wolfram appid which you need to paste in the main.py
+You also need to have Wolfram account and have the Wolfram APP Id which you need to paste in the main.py
 
 ### 📜 Set up and Running the software
 
