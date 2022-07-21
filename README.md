@@ -1,6 +1,6 @@
 ## Wolfram|Alpha-API
  
-# 👋 This is an API to send query to Wolfram|Alpha and get getting the result outputed in image format.
+# 👋 This is an Python API to send query to Wolfram|Alpha and get getting the result outputed in image format.
 
 ### 📝Requirements
 
