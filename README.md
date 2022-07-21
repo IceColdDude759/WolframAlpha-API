@@ -6,7 +6,7 @@
 
 #### Python Version
 
-You will need to install Python 3.8 or newer with pip to run VoiceAssistant. Download and install the correct
+You will need to install Python 3.8 or newer with pip. Download and install the correct
 build and version of Python for your operating system [here](https://python.org/downloads).
 
 **macOS Users:** If you prefer, you can install Python via Homebrew rather than from source.
