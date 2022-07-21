@@ -170,6 +170,10 @@ if __name__=="__main__":
     if(Is_succesfull[0]):
         result_list=Is_succesfull[1]
 
+        #result_list is a list of image which contains the result
+        #You can change the directory to save the image
+        #or do something else with the images.
+        
         #To show the first image of the result
         #result_list[0].show()
 
@@ -182,6 +186,7 @@ if __name__=="__main__":
         for img in result_list:
             i+=1
             img.save(f"temp/result{i}.png")
-        print("Check src/temp folder")      
+        print("\nCheck src/temp folder\n")  
+
     else:
         pass  
